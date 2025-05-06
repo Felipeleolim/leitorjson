@@ -26,9 +26,14 @@
             $input = trim($_POST["textInput"]);
             $obj = [];
 
-            if (strpos($input, '=') === false) {
-                echo "Formato inválido. Não encontrei \"=\" no texto.";
-            } else {
+            // Tentando converter o texto para JSON
+            $decodedJson = json_decode($input, true);
+
+            // Se a entrada for um JSON válido, formate
+            if (json_last_error() === JSON_ERROR_NONE) {
+                echo json_encode($decodedJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            } elseif (strpos($input, '=') !== false) {
+                // Caso não seja JSON, tenta o formato chave=valor
                 $pares = explode('&', $input);
 
                 foreach ($pares as $par) {
@@ -48,6 +53,8 @@
                 }
 
                 echo json_encode($obj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            } else {
+                echo "Formato inválido. Não encontrei \"=\" no texto.";
             }
         }
         ?></pre>
